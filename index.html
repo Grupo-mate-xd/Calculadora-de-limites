@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Límites</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background-image: url('miau.gif');
+      font-family: "Times New Roman";
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .logo {
+      height: 40px;
+    }
+    p {
+      color: blue;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 18px;
+      color: #3B83BD;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      font-family: "Times New Roman";
+    }
+    .result {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #007BFF;
+    }
+    #plot-wrapper {
+      width: 100%;
+      margin-top: 20px;
+    }
+    #plot {
+      min-width: 100%;
+    }
+    .footer {
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+      background-color: #222;
+      color: white;
+      font-size: 14px;
+      margin-top: 30px;
+    }
+    #limitePreview {
+      margin-top: 15px;
+      font-size: 20px;
+      font-family: 'Times New Roman';
+      font-weight: bold;
+    }
+
+    .Leyenda{
+      text-align: left;
+    }
+    .info{
+      text-align: left;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+  <script src="https://unpkg.com/function-plot@1.23.1/dist/function-plot.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1><img src="logounab.png" class="logo">CALCULADORA DE LIMITES</h1>
+    <p>Esta calculadora está diseñada para resolver límites algebraicos, trigonométricos, infinitos y al infinito.</p>
+    <input type="text" id="funcion" placeholder="Ej: 1/x, x^2, sin(x)/x" oninput="actualizarVistaLimite()">
+    <label for="direccion">x tiende a:</label>
+    <input type="text" id="direccion" placeholder="Ej: 2, -1, 6-, Infinito, -Infinito" oninput="actualizarVistaLimite()">
+<details class= "Leyenda">
+  <summary><strong>Cómo escribir funciones y símbolos</strong></summary>
+  <div class="info">
+    <p><strong>📌 Funciones matemáticas comunes:</strong></p>
+    <ul>
+      <li> Seno——— sin(x) </li>
+      <li> Coseno ——— cos(x) </li>
+      <li> Tangente ——— tan(x) </li>
+      <li> Secante ——— sec(x) </li>
+      <li> Cosecante ——— csc(x) </li>
+      <li> Cotangente ——— cot(x) </li>
+      <li> Arcotangente ——— atan(x) </li>
+      <li> Todas las Inversas usan prefijo a (asin(x), etc.)</li>
+      <li> Raíz cuadrada ——— sqrt(x) </li>
+      <li> Raíz cúbica ——— cbrt(x) </li>
+      <li> Raíz enésima ——— x^(1/n) </li>
+      <li> Valor absoluto ——— abs(x) </li>
+      <li> Exponencial ——— exp(x) </li>
+      <li> Signo ——— sign(x) </li>
+      <li> Mínimo entero ——— floor(x) </li>
+      <li> Máximo entero ——— ceil(x) </li>
+      <li> Redondeo ——— round(x) </li>
+      <li> Truncar ——— fix(x) </li>
+      <li> Gamma (Factorial) ——— gamma(x) = (x-1)! </li>
+      
+    </ul>
+    <p><strong>📌 Operaciones básicas:</strong></p>
+    <ul>
+      <li> Suma ——— (a)+(b) </li>
+      <li> Resta ——— (a)-(b) </li>
+      <li> Multiplicacion ——— (a)*(b) </li>
+      <li> Division ——— (a)/(b) </li>
+      <li> Potencia ——— (a)^(b) </li>
+    </ul>
+    <p><strong>📌 Logaritmos:</strong></p>
+    <ul>
+      <li> Logaritmo en base "N" ——— log(x , N) </li>
+      <li> Logaritmo natural ——— log(x) </li>
+      <li> Logaritmo en base 10 ——— log10(x)</li>
+    </ul>
+    <p><strong>📌 Constantes matemáticas:</strong></p>
+    <ul>
+      <li> π ——— pi = 3.14 </li>
+      <li> e ——— e = 2.71 </li>
+      <li> τ ——— tau = 6.28 </li>
+    </ul>
+  </div>
+</details>
+    <div id="limitePreview">
+      lim<sub><span id="variable">x</span> → <span id="valor">a</span></sub> <span id="funcionPreview">f(x)</span>
+    </div>
+    <button onclick="calcularYGraficar()">Calcular y Graficar</button>
+    <div class="result" id="resultado"></div>
+    <div id="Grafica">
+      <div id="plot"></div>
+    </div>
+    <audio src='musica.mp3' autoplay ></audio>
+  </div>
+  <script>
+    function actualizarVistaLimite() {
+      const direccionInput = document.getElementById("direccion").value.trim();
+      const funcionInput = document.getElementById("funcion").value.trim();
+      const coincidencias = funcionInput.match(/[a-zA-Z]/g);
+      const variable = coincidencias && coincidencias.length > 0 ? coincidencias[0] : "x";
+
+      document.getElementById("variable").innerText = variable;
+      document.getElementById("valor").innerText = direccionInput || "a";
+      document.getElementById("funcionPreview").innerText = funcionInput || "f(x)";
+    }
+
+    function calcularYGraficar() {
+      actualizarVistaLimite();
+
+      const funcionInput = document.getElementById("funcion").value;
+      let direccionInput = document.getElementById("direccion").value.trim();
+      const resultado = document.getElementById("resultado");
+      const contenedor = document.getElementById("Grafica");
+      const anchoContenedor = contenedor.offsetWidth;
+      const grafAncho = Math.min(anchoContenedor, 600);
+      const grafAlto = grafAncho * 0.65;
+      let lateral = null;
+      
+
+      if (direccionInput.endsWith("+")) {
+        lateral = "right";
+        direccionInput = direccionInput.slice(0, -1).trim();
+      } else if (direccionInput.endsWith("-")) {
+        lateral = "left";
+        direccionInput = direccionInput.slice(0, -1).trim();
+      }
+
+      let direccion;
+      if (direccionInput.toLowerCase() === "infinito" || direccionInput === "+∞") {
+        direccion = Infinity;
+      } else if (direccionInput.toLowerCase() === "-infinito" || direccionInput === "-∞") {
+        direccion = -Infinity;
+      } else {
+        direccion = parseFloat(direccionInput);
+        if (isNaN(direccion)) {
+          resultado.innerText = "Valor de x inválido.";
+          return;
+        }
+      }
+
+      const tieneFuncionRedondeo = /floor|ceil|round|fix/.test(funcionInput);
+
+      if (tieneFuncionRedondeo && !isNaN(direccion)) {
+        if (
+          (/floor|ceil|fix/.test(funcionInput) && Math.floor(direccion) === direccion) ||
+          (/round/.test(funcionInput) && (direccion % 1 === 0.5))
+        ) {
+          resultado.innerText = "¡Error! Límite no existe (discontinuidad en este punto).";
+          return;
+        }
+      }
+
+      try {
+        const expr = math.parse(funcionInput);
+        const compiled = expr.compile();
+        let valores = [];
+
+        if (direccion === Infinity || direccion === -Infinity) {
+          const paso = direccion === Infinity ? 1e6 : -1e6;
+          for (let i = 1; i <= 10; i++) {
+            const x = paso * i;
+            const res = compiled.evaluate({ x });
+            if (!isNaN(res) && isFinite(res)) {
+              valores.push(res);
+            }
+          }
+        } else {
+          const epsilon = 1e-5;
+          if (lateral === "right") {
+            for (let i = 10; i >= 1; i--) {
+              const x = direccion + epsilon * i;
+              const res = compiled.evaluate({ x });
+              if (isFinite(res)) valores.push(res);
+            }
+          } else if (lateral === "left") {
+            for (let i = 10; i >= 1; i--) {
+              const x = direccion - epsilon * i;
+              const res = compiled.evaluate({ x });
+              if (isFinite(res)) valores.push(res);
+            }
+          } else {
+            for (let i = 10; i >= 1; i--) {
+              const x1 = direccion - epsilon * i;
+              const x2 = direccion + epsilon * i;
+              const res1 = compiled.evaluate({ x: x1 });
+              const res2 = compiled.evaluate({ x: x2 });
+              if (isFinite(res1)) valores.push(res1);
+              if (isFinite(res2)) valores.push(res2);
+            }
+          }
+
+          try {
+            const exacto = compiled.evaluate({ x: direccion });
+            if (isFinite(exacto)) {
+              valores.push(exacto);
+            }
+          } catch (e) {}
+        }
+
+        if (valores.length === 0) {
+          resultado.innerText = "No se pudo calcular el límite.";
+          return;
+        }
+
+        const limite = valores[valores.length - 1];
+        const crecimiento = valores[valores.length - 1] - valores[0];
+
+        if (direccion === Infinity || direccion === -Infinity) {
+          if (Math.abs(crecimiento) > 1e6) {
+            resultado.innerText = "El límite es Infinito";
+          } else if (Math.abs(crecimiento) < 1e-5) {
+            resultado.innerText = "Límite: " + (Number.isInteger(limite) ? limite : limite.toFixed(2));
+          } else {
+            resultado.innerText = "Límite aproximado: " + (Number.isInteger(limite) ? limite : limite.toFixed(2));
+          }
+        } else {
+          resultado.innerText = "Límite aproximado: " + (Number.isInteger(limite) ? limite : limite.toFixed(2));
+        }
+
+        document.getElementById("plot").innerHTML = "";
+
+        functionPlot({
+          target: "#plot",
+          width: grafAncho,
+          height: grafAlto,
+          grid: true,
+          xAxis: { domain: [-10, 10] },
+          yAxis: { domain: [-10, 10] },
+          data: [
+            {
+              fn: funcionInput,
+              graphType: "polyline",
+              sampler: "builtIn",
+            },
+          ],
+        });
+      } catch (error) {
+        resultado.innerText = "Verifica si está bien escrito tu problema";
+        document.getElementById("plot").innerHTML = "";
+      }
+    }
+  </script>
+  <footer class="footer">2025 Calculadora de Límites - Hecho por grupo los pulpos xd</footer>
+</body>
+</html>
