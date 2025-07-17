@@ -6,25 +6,22 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+  <script src="https://unpkg.com/function-plot@1.23.1/dist/function-plot.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
   <style>
-    * {
-      box-sizing: border-box;
-    }
     body {
       background-image: url('miau.gif');
       font-family: "Times New Roman";
       display: flex;
-      justify-content: center;
-      align-items: center;
       flex-direction: column;
+      align-items: center;
       min-height: 100vh;
     }
-    .logo {
-      height: 40px;
-    }
-    p {
-      color: blue;
-    }
+
     .container {
       background: white;
       padding: 30px;
@@ -33,6 +30,7 @@
       width: 100%;
       text-align: center;
     }
+
     h1 {
       font-family: 'Press Start 2P', cursive;
       font-size: 18px;
@@ -43,26 +41,83 @@
       justify-content: center;
       gap: 10px;
     }
-    input, select, button {
+
+    input, button {
       width: 100%;
       padding: 10px;
       margin-top: 10px;
       font-size: 16px;
-      font-family: "Times New Roman";
     }
-    .result {
+
+    .resultado {
       margin-top: 15px;
       font-weight: bold;
       color: #007BFF;
     }
-    #plot-wrapper {
-      width: 100%;
-      margin-top: 20px;
-    }
+
     #plot {
-      min-width: 100%;
+      width: 100%;
+      height: 300px;
     }
-    .footer {
+
+    #vistaLimite {
+      margin-top: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      min-height: 40px;
+    }
+
+    .seccion-teclado {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .seccion-teclado.activa {
+      display: flex;
+    }
+
+    p{
+      color: #007BFF;
+    }
+    .btn-tecla {
+      padding: 12px;
+      width: 50px;
+      height: 50px;
+      background-color: #eee;
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #toggleTeclado {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .pestañas-teclado {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .pestaña {
+      padding: 5px 10px;
+      background-color: #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .pie {
       width: 100%;
       text-align: center;
       padding: 10px;
@@ -71,236 +126,210 @@
       font-size: 14px;
       margin-top: 30px;
     }
-    #limitePreview {
-      margin-top: 15px;
-      font-size: 20px;
-      font-family: 'Times New Roman';
-      font-weight: bold;
-    }
-
-    .Leyenda{
-      text-align: left;
-    }
-    .info{
-      text-align: left;
-    }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
-  <script src="https://unpkg.com/function-plot@1.23.1/dist/function-plot.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1><img src="logounab.png" class="logo">CALCULADORA DE LIMITES</h1>
+    <h1><img src="logounab.png" height="40">CALCULADORA DE LÍMITES</h1>
     <p>Esta calculadora está diseñada para resolver límites algebraicos, trigonométricos, infinitos y al infinito.</p>
+
     <input type="text" id="funcion" placeholder="Ej: 1/x, x^2, sin(x)/x" oninput="actualizarVistaLimite()">
     <label for="direccion">x tiende a:</label>
     <input type="text" id="direccion" placeholder="Ej: 2, -1, 6-, Infinito, -Infinito" oninput="actualizarVistaLimite()">
-<details class= "Leyenda">
-  <summary><strong>Cómo escribir funciones y símbolos</strong></summary>
-  <div class="info">
-    <p><strong>📌 Funciones matemáticas comunes:</strong></p>
-    <ul>
-      <li> Seno——— sin(x) </li>
-      <li> Coseno ——— cos(x) </li>
-      <li> Tangente ——— tan(x) </li>
-      <li> Secante ——— sec(x) </li>
-      <li> Cosecante ——— csc(x) </li>
-      <li> Cotangente ——— cot(x) </li>
-      <li> Arcotangente ——— atan(x) </li>
-      <li> Todas las Inversas usan prefijo a (asin(x), etc.)</li>
-      <li> Raíz cuadrada ——— sqrt(x) </li>
-      <li> Raíz cúbica ——— cbrt(x) </li>
-      <li> Raíz enésima ——— x^(1/n) </li>
-      <li> Valor absoluto ——— abs(x) </li>
-      <li> Exponencial ——— exp(x) </li>
-      <li> Signo ——— sign(x) </li>
-      <li> Mínimo entero ——— floor(x) </li>
-      <li> Máximo entero ——— ceil(x) </li>
-      <li> Redondeo ——— round(x) </li>
-      <li> Truncar ——— fix(x) </li>
-      <li> Gamma (Factorial) ——— gamma(x) = (x-1)! </li>
-      
-    </ul>
-    <p><strong>📌 Operaciones básicas:</strong></p>
-    <ul>
-      <li> Suma ——— (a)+(b) </li>
-      <li> Resta ——— (a)-(b) </li>
-      <li> Multiplicacion ——— (a)*(b) </li>
-      <li> Division ——— (a)/(b) </li>
-      <li> Potencia ——— (a)^(b) </li>
-    </ul>
-    <p><strong>📌 Logaritmos:</strong></p>
-    <ul>
-      <li> Logaritmo en base "N" ——— log(x , N) </li>
-      <li> Logaritmo natural ——— log(x) </li>
-      <li> Logaritmo en base 10 ——— log10(x)</li>
-    </ul>
-    <p><strong>📌 Constantes matemáticas:</strong></p>
-    <ul>
-      <li> π ——— pi = 3.14 </li>
-      <li> e ——— e = 2.71 </li>
-      <li> τ ——— tau = 6.28 </li>
-    </ul>
-  </div>
-</details>
-    <div id="limitePreview">
-      lim<sub><span id="variable">x</span> → <span id="valor">a</span></sub> <span id="funcionPreview">f(x)</span>
+
+    <button id="toggleTeclado" onclick="toggleTeclado()">Mostrar Teclado</button>
+
+    <div id="teclado" style="display: none;">
+      <div class="pestañas-teclado">
+        <div class="pestaña" onclick="cambiarSeccion(0)">Símbolos</div>
+        <div class="pestaña" onclick="cambiarSeccion(1)">Funciones</div>
+        <div class="pestaña" onclick="cambiarSeccion(2)">Especiales</div>
+      </div>
+
+      <div class="seccion-teclado activa">
+        <button class="btn-tecla" onclick="insertar('x')">x</button>
+        <button class="btn-tecla" onclick="insertar('3.14')">π</button>
+        <button class="btn-tecla" onclick="insertar('2.71')">e</button>
+        <button class="btn-tecla" onclick="insertar('6.28')">τ</button>
+        <button class="btn-tecla" onclick="insertar('x^2')">x²</button>
+        <button class="btn-tecla" onclick="insertar('x^')">x^□</button>
+        <button class="btn-tecla" onclick="insertar('sqrt(x)')">√x</button>
+        <button class="btn-tecla" onclick="insertar('cbrt(x)')">³√x</button>
+        <button class="btn-tecla" onclick="insertar('x^(1/n)')">x^(1/n)</button>
+        <button class="btn-tecla" onclick="insertar('abs(x)')">|□|</button>
+        <button class="btn-tecla" onclick="insertar('(a)/(b)')">a/b</button>
+        <button class="btn-tecla" onclick="insertar('exp(x)')">e(x)</button>
+        <button class="btn-tecla" onclick="insertar('sign(x)')">sgn(x)</button>
+        <button class="btn-tecla" onclick="insertar('floor(x)')">⌊x⌋</button>
+        <button class="btn-tecla" onclick="insertar('ceil(x)')">[[x]]</button>
+        <button class="btn-tecla" onclick="insertar('round(x)')">≈</button>
+        <button class="btn-tecla" onclick="insertar('fix(x)')">Truncar</button>
+        <button class="btn-tecla" onclick="insertar('gamma(x)')">Factorial</button>
+        <button class="btn-tecla" onclick="insertar('+')">+</button>
+        <button class="btn-tecla" onclick="insertar('-')">−</button>
+        <button class="btn-tecla" onclick="insertar('*')">×</button>
+        <button class="btn-tecla" onclick="insertar('/')">÷</button>
+      </div>
+
+      <div class="seccion-teclado">
+        <button class="btn-tecla" onclick="insertar('sin(x)')">sin</button>
+        <button class="btn-tecla" onclick="insertar('cos(x)')">cos</button>
+        <button class="btn-tecla" onclick="insertar('tan(x)')">tan</button>
+        <button class="btn-tecla" onclick="insertar('asin(x)')">asin</button>
+        <button class="btn-tecla" onclick="insertar('acos(x)')">acos</button>
+        <button class="btn-tecla" onclick="insertar('atan(x)')">atan</button>
+        <button class="btn-tecla" onclick="insertar('ln(x)')">ln</button>
+        <button class="btn-tecla" onclick="insertar('log10(x)')">log10</button>
+        <button class="btn-tecla" onclick="insertar('log(x,2)')">log₂</button>
+        <button class="btn-tecla" onclick="insertar('exp(x)')">e^x</button>
+      </div>
+
+      <div class="seccion-teclado">
+        <button class="btn-tecla" onclick="insertar('Infinity')">∞</button>
+        <button class="btn-tecla" onclick="insertar('+Infinity')">+∞</button>
+        <button class="btn-tecla" onclick="insertar('<')">&lt;</button>
+        <button class="btn-tecla" onclick="insertar('>')">&gt;</button>
+        <button class="btn-tecla" onclick="insertar('|')">|</button>
+        <button class="btn-tecla" onclick="insertar('^')">^</button>
+        <button class="btn-tecla" onclick="insertar('!')">!</button>
+        <button class="btn-tecla" onclick="insertar('(')">(</button>
+        <button class="btn-tecla" onclick="insertar(')')">)</button>
+      </div>
     </div>
+
+    <div id="vistaLimite"></div>
+
     <button onclick="calcularYGraficar()">Calcular y Graficar</button>
-    <div class="result" id="resultado"></div>
-    <div id="Grafica">
-      <div id="plot"></div>
-    </div>
-    <audio src='musica.mp3' controls ></audio>
+    <div class="resultado" id="resultado"></div>
+    <div id="plot"></div>
+
+    <audio src="musica.mp3" autoplay></audio>
   </div>
-  <script>
-    function actualizarVistaLimite() {
-      const direccionInput = document.getElementById("direccion").value.trim();
-      const funcionInput = document.getElementById("funcion").value.trim();
-      const coincidencias = funcionInput.match(/[a-zA-Z]/g);
-      const variable = coincidencias && coincidencias.length > 0 ? coincidencias[0] : "x";
 
-      document.getElementById("variable").innerText = variable;
-      document.getElementById("valor").innerText = direccionInput || "a";
-      document.getElementById("funcionPreview").innerText = funcionInput || "f(x)";
+  <footer class="pie">2025 Calculadora de Límites - Hecho por grupo los pulpos xd</footer>
+    <script>
+  function actualizarVistaLimite() {
+    const direccion = document.getElementById("direccion").value.trim() || "a";
+    const funcionTexto = document.getElementById("funcion").value.trim() || "f(x)";
+    let latexFuncion = funcionTexto;
+
+    try {
+      const expr = math.parse(funcionTexto);
+      latexFuncion = expr.toTex(); // Convierte a LaTeX automáticamente
+    } catch (e) {
+      latexFuncion = funcionTexto; // En caso de error, lo muestra plano
     }
 
-    function calcularYGraficar() {
-      actualizarVistaLimite();
+    const latex = `\\(\\displaystyle \\lim_{x \\to ${direccion}} ${latexFuncion}\\)`;
+    document.getElementById("vistaLimite").innerHTML = latex;
+    if (window.MathJax) MathJax.typesetPromise();
+  }
 
-      const funcionInput = document.getElementById("funcion").value;
-      let direccionInput = document.getElementById("direccion").value.trim();
-      const resultado = document.getElementById("resultado");
-      const contenedor = document.getElementById("Grafica");
-      const anchoContenedor = contenedor.offsetWidth;
-      const grafAncho = Math.min(anchoContenedor, 600);
-      const grafAlto = grafAncho * 0.65;
-      let lateral = null;
-      
+  function insertar(texto) {
+    const input = document.getElementById("funcion");
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    input.value = input.value.slice(0, start) + texto + input.value.slice(end);
+    input.focus();
+    input.selectionStart = input.selectionEnd = start + texto.length;
+    actualizarVistaLimite();
+  }
 
-      if (direccionInput.endsWith("+")) {
-        lateral = "right";
-        direccionInput = direccionInput.slice(0, -1).trim();
-      } else if (direccionInput.endsWith("-")) {
-        lateral = "left";
-        direccionInput = direccionInput.slice(0, -1).trim();
+  function toggleTeclado() {
+    const teclado = document.getElementById("teclado");
+    teclado.style.display = teclado.style.display === "none" ? "block" : "none";
+  }
+
+  function cambiarSeccion(indice) {
+    const secciones = document.querySelectorAll(".seccion-teclado");
+    secciones.forEach((sec, i) => sec.classList.toggle("activa", i === indice));
+  }
+
+  function calcularYGraficar() {
+    actualizarVistaLimite();
+    const funcion = document.getElementById("funcion").value;
+    let direccion = document.getElementById("direccion").value.trim();
+    const resultado = document.getElementById("resultado");
+
+    let x;
+    let esInfinitoPositivo = false;
+    let esInfinitoNegativo = false;
+
+    if (direccion.toLowerCase() === "infinito" || direccion === "+∞") {
+      x = 1e6;
+      esInfinitoPositivo = true;
+    } else if (direccion.toLowerCase() === "-infinito" || direccion === "-∞") {
+      x = -1e6;
+      esInfinitoNegativo = true;
+    } else {
+      x = parseFloat(direccion);
+      if (isNaN(x)) {
+        resultado.innerText = "Valor inválido para x.";
+        return;
+      }
+    }
+
+    try {
+      const expr = math.parse(funcion);
+      const comp = expr.compile();
+      const epsilon = 1e-10;
+
+      let izquierda = [];
+      let derecha = [];
+
+      for (let i = 10; i >= 1; i--) {
+        if (esInfinitoPositivo || esInfinitoNegativo) {
+          const factor = 1 + i * 0.01;
+          izquierda.push(comp.evaluate({ x: x * (factor - 0.001) }));
+          derecha.push(comp.evaluate({ x: x * (factor + 0.001) }));
+        } else {
+          izquierda.push(comp.evaluate({ x: x - epsilon * i }));
+          derecha.push(comp.evaluate({ x: x + epsilon * i }));
+        }
       }
 
-      let direccion;
-      if (direccionInput.toLowerCase() === "infinito" || direccionInput === "+∞") {
-        direccion = Infinity;
-      } else if (direccionInput.toLowerCase() === "-infinito" || direccionInput === "-∞") {
-        direccion = -Infinity;
+      const limIzq = izquierda[izquierda.length - 1];
+      const limDer = derecha[derecha.length - 1];
+
+      const esInfinitoPos = (v) => !isNaN(v) && (v === Infinity || v > 1e6);
+      const esInfinitoNeg = (v) => !isNaN(v) && (v === -Infinity || v < -1e6);
+
+      if ((esInfinitoPos(limIzq) && esInfinitoNeg(limDer)) ||
+          (esInfinitoNeg(limIzq) && esInfinitoPos(limDer))) {
+        resultado.innerText = "El límite es infinito.";
+      } else if (esInfinitoPos(limIzq) && esInfinitoPos(limDer)) {
+        resultado.innerText = "Límite: +∞";
+      } else if (esInfinitoNeg(limIzq) && esInfinitoNeg(limDer)) {
+        resultado.innerText = "Límite: −∞";
+      } else if (!isFinite(limIzq) || !isFinite(limDer)) {
+        resultado.innerText = "El límite es 0";
+      } else if (Math.abs(limIzq - limDer) > 1e-2) {
+        resultado.innerText = "El límite no existe.";
+      } else if (Math.abs((limIzq + limDer) / 2 - 1) < 1e-2) {
+        resultado.innerText = "Límite aproximado: 1";
       } else {
-        direccion = parseFloat(direccionInput);
-        if (isNaN(direccion)) {
-          resultado.innerText = "Valor de x inválido.";
-          return;
-        }
+        const promedio = (limIzq + limDer) / 2;
+        resultado.innerText = "Límite aproximado: " + 
+          (Number.isInteger(promedio) ? promedio : promedio.toFixed(4));
       }
 
-      const tieneFuncionRedondeo = /floor|ceil|round|fix/.test(funcionInput);
+      // Graficar
+      document.getElementById("plot").innerHTML = "";
+      functionPlot({
+        target: "#plot",
+        width: 480,
+        height: 300,
+        grid: true,
+        data: [{ fn: funcion, graphType: "polyline" }]
+      });
 
-      if (tieneFuncionRedondeo && !isNaN(direccion)) {
-        if (
-          (/floor|ceil|fix/.test(funcionInput) && Math.floor(direccion) === direccion) ||
-          (/round/.test(funcionInput) && (direccion % 1 === 0.5))
-        ) {
-          resultado.innerText = "¡Error! Límite no existe (discontinuidad en este punto).";
-          return;
-        }
-      }
-
-      try {
-        const expr = math.parse(funcionInput);
-        const compiled = expr.compile();
-        let valores = [];
-
-        if (direccion === Infinity || direccion === -Infinity) {
-          const paso = direccion === Infinity ? 1e6 : -1e6;
-          for (let i = 1; i <= 10; i++) {
-            const x = paso * i;
-            const res = compiled.evaluate({ x });
-            if (!isNaN(res) && isFinite(res)) {
-              valores.push(res);
-            }
-          }
-        } else {
-          const epsilon = 1e-5;
-          if (lateral === "right") {
-            for (let i = 10; i >= 1; i--) {
-              const x = direccion + epsilon * i;
-              const res = compiled.evaluate({ x });
-              if (isFinite(res)) valores.push(res);
-            }
-          } else if (lateral === "left") {
-            for (let i = 10; i >= 1; i--) {
-              const x = direccion - epsilon * i;
-              const res = compiled.evaluate({ x });
-              if (isFinite(res)) valores.push(res);
-            }
-          } else {
-            for (let i = 10; i >= 1; i--) {
-              const x1 = direccion - epsilon * i;
-              const x2 = direccion + epsilon * i;
-              const res1 = compiled.evaluate({ x: x1 });
-              const res2 = compiled.evaluate({ x: x2 });
-              if (isFinite(res1)) valores.push(res1);
-              if (isFinite(res2)) valores.push(res2);
-            }
-          }
-
-          try {
-            const exacto = compiled.evaluate({ x: direccion });
-            if (isFinite(exacto)) {
-              valores.push(exacto);
-            }
-          } catch (e) {}
-        }
-
-        if (valores.length === 0) {
-          resultado.innerText = "No se pudo calcular el límite.";
-          return;
-        }
-
-        const limite = valores[valores.length - 1];
-        const crecimiento = valores[valores.length - 1] - valores[0];
-
-        if (direccion === Infinity || direccion === -Infinity) {
-          if (Math.abs(crecimiento) > 1e6) {
-            resultado.innerText = "El límite es Infinito";
-          } else if (Math.abs(crecimiento) < 1e-5) {
-            resultado.innerText = "Límite: " + (Number.isInteger(limite) ? limite : limite.toFixed(2));
-          } else {
-            resultado.innerText = "Límite aproximado: " + (Number.isInteger(limite) ? limite : limite.toFixed(2));
-          }
-        } else {
-          resultado.innerText = "Límite aproximado: " + (Number.isInteger(limite) ? limite : limite.toFixed(2));
-        }
-
-        document.getElementById("plot").innerHTML = "";
-
-        functionPlot({
-          target: "#plot",
-          width: grafAncho,
-          height: grafAlto,
-          grid: true,
-          xAxis: { domain: [-10, 10] },
-          yAxis: { domain: [-10, 10] },
-          data: [
-            {
-              fn: funcionInput,
-              graphType: "polyline",
-              sampler: "builtIn",
-            },
-          ],
-        });
-      } catch (error) {
-        resultado.innerText = "Verifica si está bien escrito tu problema";
-        document.getElementById("plot").innerHTML = "";
-      }
+    } catch (error) {
+      resultado.innerText = "Verifica si la función está bien escrita.";
+      document.getElementById("plot").innerHTML = "";
     }
-  </script>
-  <footer class="footer">2025 Calculadora de Límites - Hecho por grupo los pulpos xd</footer>
+  }
+</script>
+ 
+
 </body>
 </html>
